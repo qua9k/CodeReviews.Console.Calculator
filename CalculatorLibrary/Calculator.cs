@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+﻿using System.Text;
 using Newtonsoft.Json;
 
 namespace CalculatorLibrary;
@@ -6,6 +6,8 @@ namespace CalculatorLibrary;
 public class Calculator
 {
     readonly JsonWriter writer;
+
+    readonly List<string> history = [];
 
     public Calculator()
     {
@@ -20,6 +22,7 @@ public class Calculator
     public double DoOperation(double num1, double num2, string op)
     {
         double result = double.NaN;
+        StringBuilder operation = new();
 
         writer.WriteStartObject();
         writer.WritePropertyName("Operand1");
@@ -30,24 +33,32 @@ public class Calculator
 
         switch (op)
         {
-            case "a":
+            case "+":
                 result = num1 + num2;
                 writer.WriteValue("Add");
                 break;
-            case "s":
+            case "-":
                 result = num1 - num2;
                 writer.WriteValue("Subtract");
                 break;
-            case "m":
+            case "*":
                 result = num1 * num2;
                 writer.WriteValue("Multiply");
                 break;
-            case "d":
+            case "/":
                 if (num2 != 0)
                 {
                     result = num1 / num2;
                 }
                 writer.WriteValue("Divide");
+                break;
+            case "^":
+                result = Math.Pow(num1, num2);
+                writer.WriteValue("Exponentiate");
+                break;
+            case "log":
+                result = Math.Log(num1, num2);
+                writer.WriteValue("Logarithm");
                 break;
             default:
                 break;
@@ -56,7 +67,38 @@ public class Calculator
         writer.WriteValue(result);
         writer.WriteEndObject();
 
+        operation.Append($"{num1} {op} {num2} = {result}");
+        history.Add(operation.ToString());
+
         return result;
+    }
+
+    public void PrintHistory()
+    {
+        int i = 1;
+
+        Console.WriteLine(
+            """
+            History 
+
+            """
+        );
+        foreach (string operation in history)
+        {
+            Console.WriteLine($"{i}: {operation}");
+            i += 1;
+        }
+    }
+
+    public void ClearHistory()
+    {
+        Console.WriteLine(
+            """
+            History cleared.
+
+            """
+        );
+        history.Clear();
     }
 
     public void Finish()
