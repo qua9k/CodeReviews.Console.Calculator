@@ -63,6 +63,7 @@ public class Calculator
             default:
                 break;
         }
+        result = Math.Round(result, 2);
         writer.WritePropertyName("Result");
         writer.WriteValue(result);
         writer.WriteEndObject();
@@ -75,6 +76,12 @@ public class Calculator
 
     public void PrintHistory()
     {
+        if (history.Count <= 0)
+        {
+            Console.WriteLine("The history is empty.");
+            return;
+        }
+
         int i = 1;
 
         Console.WriteLine(
